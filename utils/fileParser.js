@@ -5,7 +5,7 @@ const error = require('./errorHandle');
 
 async function readFastaFile(strFilePath){
 	try{
-		await error.logMessage(error.levels.INFO, error.types.FASTAFILE, `Opening FASTA file ${strFilePath}.`);
+		await error.logMessage(error.levels.INFO, error.types.FASTAFILE, `Opening FASTA file '${strFilePath}'.`);
 		const bufferFileContent = await fs.readFile(strFilePath, 'utf8');
 		const strFileContent = bufferFileContent.toString('utf8');
 		const objFastaData = Fasta.parse(strFileContent);
