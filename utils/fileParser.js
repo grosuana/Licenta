@@ -5,13 +5,13 @@ const error = require('./errorHandle');
 
 async function readFastaFile(strFilePath){
 	try{
-		await error.logMessage(error.levels.INFO, error.types.FASTFILEOPEN, `Opening FASTA file ${strFilePath}.`);
+		await error.logMessage(error.levels.INFO, error.types.FASTAFILE, `Opening FASTA file ${strFilePath}.`);
 		const bufferFileContent = await fs.readFile(strFilePath, 'utf8');
 		const strFileContent = bufferFileContent.toString('utf8');
 		const objFastaData = Fasta.parse(strFileContent);
 		return objFastaData;
 	} catch(e) {
-		await error.logMessage(error.levels.ERROR, error.types.FASTFILEOPEN, e.message);
+		await error.logMessage(error.levels.ERROR, error.types.FASTAFILE, e.message);
 		process.exitCode = -1;
 	}
     
