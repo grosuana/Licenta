@@ -1,6 +1,6 @@
 const fileParser = require('./utils/fileParser');
 const strFilePath = './testData/test.fna';
-const strWrongFilePath = './testData/nuexistt';
+// const strWrongFilePath = './testData/nuexistt';
 const errorHandle = require('./utils/errorHandle');
 
 fileParser.readFastaFile(strFilePath);
