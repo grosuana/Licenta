@@ -1,112 +1,132 @@
-let test = require('./freqWordsTest');
+const objTestHelper = require('./freqWordsTest');
 const _ = require('lodash');
 
-const profiler = require('v8-profiler');
-const id = Date.now() + '.profile'; // start profiling
-profiler.startProfiling(id);
+let eta = 0;
 
 function reverseComplement(strPattern) {
 	let strReverseComplement = '';
 	for (let i = 0; i < strPattern.length; i++) {
 		switch (strPattern[i]) {
-		case 'A':
-			strReverseComplement = strReverseComplement.concat('T');
-			break;
-		case 'T':
-			strReverseComplement = strReverseComplement.concat('A');
-			break;
-		case 'C':
-			strReverseComplement = strReverseComplement.concat('G');
-			break;
-		case 'G':
-			strReverseComplement = strReverseComplement.concat('C');
-			break;
-
-		default:
-			break;
+			case 'A':
+				strReverseComplement = strReverseComplement.concat('T');
+				break;
+			case 'T':
+				strReverseComplement = strReverseComplement.concat('A');
+				break;
+			case 'C':
+				strReverseComplement = strReverseComplement.concat('G');
+				break;
+			case 'G':
+				strReverseComplement = strReverseComplement.concat('C');
+				break;
+			default:
+				break;
 		}
-
 	}
-	strReverseComplement = _.reverse(strReverseComplement.split('')).join('');
-	return strReverseComplement;
+	return _.reverse(strReverseComplement.split('')).join('');
 }
 
 function immediateNeighbors(strPattern) {
-	let arrAllNucleotides = ['A', 'C', 'G', 'T'];
-	let arrImmediateNeighborhood = [strPattern];
-	for (let i = 0; i < strPattern.length; i++) {
-		let strSymbol = strPattern[i];
+	const arrAllNucleotides = ['A', 'C', 'G', 'T'];
+	const arrImmediateNeighborhood = [strPattern];
 
-		let arrNucleotidesToSubstitute = _.filter(arrAllNucleotides, function (o) {
+	/* //Which one is faster?
+	for (let i = 0; i < strPattern.length; i++) {
+		const strSymbol = strPattern[i];
+		const arrNucleotidesToSubstitute = _.filter(arrAllNucleotides, function (o) {
 			return o !== strSymbol;
 		});
-
 		arrNucleotidesToSubstitute.forEach((strNucleotide) => {
-
 			arrImmediateNeighborhood.push(strPattern.substring(0, i) + strNucleotide + strPattern.substring(i + 1));
 		});
 	}
+	*/
+	_.forEach(strPattern, (strSymbol, i) => {
+		const arrNucleotidesToSubstitute = _.filter(arrAllNucleotides, function (o) {
+			return o !== strSymbol;
+		});
+		arrNucleotidesToSubstitute.forEach((strNucleotide) => {
+			arrImmediateNeighborhood.push(strPattern.substring(0, i) + strNucleotide + strPattern.substring(i + 1));
+		});
+	})
 	return arrImmediateNeighborhood;
 }
 
 function neighbors(strPattern, nMaxMismatches) {
+	// const start = process.hrtime();
 	let arrNeighborhood = [strPattern];
 	for (let j = 0; j < nMaxMismatches; j++) {
 		arrNeighborhood.forEach((strNeighbour) => {
 			arrNeighborhood = arrNeighborhood.concat(immediateNeighbors(strNeighbour));
-			arrNeighborhood = _.uniq(arrNeighborhood);
+		
 		});
+		// const start = process.hrtime();
+		arrNeighborhood = _.uniq(arrNeighborhood);
+		// const stop = process.hrtime(start);
+		// eta = eta + stop[0] + stop[1] / 1e9;
 	}
+	// const stop = process.hrtime(start);
+	// eta = eta + stop[0] + stop[1] / 1e9;
 	return arrNeighborhood;
 }
 
 function frequentWordsWithMismathces(strGenome, strWantedLength, nMaxMismatches) {
-	let arrCandidates = [];
-	let mapFrequency = new Map();
-	let nLength = strGenome.length;
+	const arrCandidates = [];
+	const mapFrequency = new Map();
+	const nLength = strGenome.length;
 	const strReverseComplementGenome = reverseComplement(strGenome);
 
 	for (let i = 0; i <= nLength - strWantedLength; i++) {
 		console.log(i);
-		let strPattern = _.slice(strGenome, i, i + strWantedLength).join('');
-		let arrNeighborhood = neighbors(strPattern, nMaxMismatches);
-		for (let j = 0; j < arrNeighborhood.length; j++) {
-			let strNeighbor = arrNeighborhood[j];
+		const strPattern = _.slice(strGenome, i, i + strWantedLength).join('');
+		const arrNeighborhood = neighbors(strPattern, nMaxMismatches);
+		/*for (let j = 0; j < arrNeighborhood.length; j++) {
+			const strNeighbor = arrNeighborhood[j];
 			if (!mapFrequency.get(strNeighbor)) {
 				mapFrequency.set(strNeighbor, 1);
 			} else {
 				mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
 			}
-		}
+		}*/
+		arrNeighborhood.forEach((strNeighbor) => {
+			if (!mapFrequency.get(strNeighbor)) {
+				mapFrequency.set(strNeighbor, 1);
+			} else {
+				mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
+			}
+		})
 	}
 
-	strGenome = strReverseComplementGenome;
 	for (let i = 0; i <= nLength - strWantedLength; i++) {
 		console.log(i);
-		let strPattern = _.slice(strGenome, i, i + strWantedLength).join('');
-		let arrNeighborhood = neighbors(strPattern, nMaxMismatches);
-		for (let j = 0; j < arrNeighborhood.length; j++) {
-			let strNeighbor = arrNeighborhood[j];
+		const strPattern = _.slice(strReverseComplementGenome, i, i + strWantedLength).join('');
+		const arrNeighborhood = neighbors(strPattern, nMaxMismatches);
+		// for (let j = 0; j < arrNeighborhood.length; j++) {
+		// 	const strNeighbor = arrNeighborhood[j];
+		// 	if (!mapFrequency.get(strNeighbor)) {
+		// 		mapFrequency.set(strNeighbor, 1);
+		// 	} else {
+		// 		mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
+		// 	}
+		// }
+		arrNeighborhood.forEach((strNeighbor) => {
 			if (!mapFrequency.get(strNeighbor)) {
 				mapFrequency.set(strNeighbor, 1);
 			} else {
 				mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
 			}
-		}
+		})
 	}
 
-	let m = 0;
-
-	mapFrequency.forEach((value) => {
-		//value + map.get(patternReversed)
-		if (value > m) {
-			m = value;
-			//
+	let nMaxFrequency = 0;
+	mapFrequency.forEach((nFrequency) => {
+		if (nFrequency > nMaxFrequency) {
+			nMaxFrequency = nFrequency;
 		}
 	});
 
 	mapFrequency.forEach((value, key) => {
-		if (value === m) {
+		if (value === nMaxFrequency) {
 			arrCandidates.push(key);
 		}
 	});
@@ -120,7 +140,13 @@ function frequentWordsWithMismathces(strGenome, strWantedLength, nMaxMismatches)
 // })
 // console.log(string);
 
-test.testAllCases(frequentWordsWithMismathces);
+// frequentWordsWithMismathces(_.toUpper("aactctatacctcctttttgtcgaatttgtgtgatttatagagaaaatcttattaactgaaactaaaatggtaggtttggtggtaggttttgtgtacattttgtagtatctgatttttaattacataccgtatattgtattaaattgacgaacaattgcatggaattgaatatatgcaaaacaaacctaccaccaaactctgtattgaccattttaggacaacttcagggtggtaggtttctgaagctctcatcaatagactattttagtctttacaaacaatattaccgttcagattcaagattctacaacgctgttttaatgggcgttgcagaaaacttaccacctaaaatccagtatccaagccgatttcagagaaacctaccacttacctaccacttacctaccacccgggtggtaagttgcagacattattaaaaacctcatcagaagcttgttcaaaaatttcaatactcgaaacctaccacctgcgtcccctattatttactactactaataatagcagtataattgatctga"), 9, 3);
+// console.log(eta);
+
+// objTestHelper.testAllCases(frequentWordsWithMismathces);
+
+const workerThreads = require('./workerThreads');
+workerThreads(1, 2, 'ana');
 
 module.exports = {
 
