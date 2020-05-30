@@ -8,6 +8,10 @@ const {
 	workerData
 } = require('worker_threads');
 
+/** Adds up the values from the worker frequency maps into one final array
+ * @param {Array.<Map>} arrWokerMaps 
+ * @returns {Array}
+ */
 function fnConcatWorkerData(arrWokerMaps) {
 	const mapAllResponses = new Map();
 	const arrMostFrequentResponses = [];
