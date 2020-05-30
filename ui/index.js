@@ -1,6 +1,6 @@
 
-// const divCanvas = document.getElementById('particle-canvas');
-// const divChart = document.getElementById('chart');
+const divCanvas = document.getElementById('particle-canvas');
+const divChart = document.getElementById('chart');
 
 
 // eslint-disable-next-line

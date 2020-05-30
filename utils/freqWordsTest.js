@@ -2,7 +2,8 @@ const _ = require('lodash');
 
 async function testFunction(fnFunctionToTest, arrInputParams, arrExpectedResponse) { //arrExpectedResponse not in order!
 	let arrResponse = await fnFunctionToTest(...arrInputParams);
-	return (_.difference(arrResponse, arrExpectedResponse).length === 0);
+	const res = (_.difference(arrExpectedResponse, arrResponse).length === 0  && _.difference(arrResponse, arrExpectedResponse).length === 0);
+	return (res);
 }
 
 async function testAllCases(fnFunctionToTest) {

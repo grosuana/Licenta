@@ -43,8 +43,13 @@ main {
 
 #whiteWave {
   position: absolute; 
+  width: 100%;
   bottom: 0;      
   object-fit: cover;
+}
+
+#whiteWavepng {
+  width: 100%;
 }
 
 #bottom { 
