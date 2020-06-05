@@ -1,5 +1,4 @@
 const fs = require('fs');
-const fsPromise = fs.promises;
 const chalk = require('chalk');
 const argv = require('./argumentParser');
 const strLogFileName = (argv.l) || 'originer.log';
@@ -9,92 +8,114 @@ const objMessageTypes = {
 	LOGFILE: '[LOG FILE]',
 	PROCESSEXIT: '[EXIT]',
 	WARNING: '[WARNING]',
+	GENOME: '[GENOME]',
+	WORKERS: '[WORKERS]',
+	CONFIG: '[CONFIG FILE]',
+	ERROR: ' ERROR',
+	MAIN: '[MAIN]'
 };
-const levels = {
+const objLevels = {
 	SUCCESS: 0,
 	INFO: 1,
 	WARNING: 2,
 	ERROR: 3
 };
-if (argv.v > 2) {
-	printMessage(levels.WARNING, objMessageTypes.WARNING, 'Max supported verbose level is two. Set verbose level to max.');
-}
 const nVerbose = (argv.v <= 2) ? argv.v : 2;
+if (argv.v > 2) {
+	fnPrintMessage(objLevels.WARNING, objMessageTypes.WARNING, 'Max supported verbose level is 2. Verbose level was set to max.');
+}
 
 /**
- * MUST AWAIT & CATCH
+ * Closes open handles
  * @returns {Promise}
  */
-async function cleanUp() {
+function fnCleanUp() {
 	try {
 		if (objFileHandle !== undefined) {
-			return objFileHandle.close(); //promise
+			fs.closeSync(objFileHandle);
+			objFileHandle = undefined;
 		}
 	} catch (err) { //should never happen, but trust nobody
-		console.error(err);
-	}
-}
-
-async function openLogFile(strLogFileName) {
-	try {
-		objFileHandle = await fsPromise.open(strLogFileName, 'a');
-	} catch (err) {
-		printMessage(levels.ERROR, objMessageTypes.LOGFILE, err);
+		fnLogMessage(objLevels.WARNING, objMessageTypes.WARNING, err.message);
 	}
 }
 
 /**
- * MUST AWAIT to avoid multiple writes simultaneously  
+ * Obtains the log file's handle
+ * @param {String} strLogFileName 
  */
-async function writeMessageToLogfile(strType, strMessage) {	
+function openLogFile(strLogFileName) {
+	try {
+		objFileHandle = fs.openSync(strLogFileName, 'a');
+	} catch (err) {
+		fnPrintMessage(objLevels.WARNING, objMessageTypes.LOGFILE, err);
+		fnCleanUp();
+	}
+}
+
+/**
+ * Writes a given message to the log file
+ * @param {String} strType one of objMessageTypes
+ * @param {String} strMessage description of what happened
+ */
+function fnWriteMessageToLogfile(strType, strMessage) {
 	try {
 		if (objFileHandle === undefined) {
-			await openLogFile(strLogFileName);
+			openLogFile(strLogFileName);
 		}
 		if (objFileHandle !== undefined) {
-			await objFileHandle.write(`${new Date().toISOString()} ${strType}: ${strMessage}\n`);
+			fs.writeSync(objFileHandle, `${new Date().toISOString()} ${strType}: ${strMessage}\n`);
 		} else {
-			printMessage(levels.ERROR, objMessageTypes.LOGFILE, 'Could not open log file.');
+			fnPrintMessage(objLevels.WARNING, objMessageTypes.LOGFILE, 'Could not open log file.');
 		}
 	} catch (err) {
-		printMessage(levels.ERROR, objMessageTypes.LOGFILE, err.message);
+		fnPrintMessage(objLevels.WARNING, objMessageTypes.LOGFILE, err.message);
+		fnCleanUp();
 	}
 }
 
-function printMessage(nLevel, strType, strMessage) {
+/**
+ * Prints information to screen, depending on the verbosity level
+ * @param {Number} nLevel gravity of the message
+ * @param {String} strType type (one of objMessageTypes)
+ * @param {String} strMessage text to describe what happened
+ */
+function fnPrintMessage(nLevel, strType, strMessage) {
 	try {
-		if (nLevel === levels.INFO && nVerbose >= 2) {
-			console.log(`${chalk.inverse(strType.toString())}: ${strMessage.toString()}`);
-		} else if (nLevel === levels.SUCCESS && nVerbose >= 2) {
-			console.log(`${chalk.bgGreen(strType.toString())}: ${chalk.green(strMessage.toString())}`);
-		} else if (nLevel === levels.WARNING && nVerbose >= 1) {
-			console.log(`${chalk.bgYellow(strType.toString())}: ${chalk.yellow(strMessage.toString())}`);
-		} else if (nLevel === levels.ERROR && nVerbose >= 1) {
-			console.log(`${chalk.bgRed(strType.toString())}: ${chalk.red(strMessage.toString())}`);
+		if (nLevel === objLevels.INFO && nVerbose >= 2) {
+			console.log(`${chalk.inverse(chalk.bold(strType))}: ${strMessage}`);
+		} else if (nLevel === objLevels.SUCCESS /*&& nVerbose >= 2*/ ) {
+			console.log(`${chalk.bgGreen(chalk.bold(strType))}: ${chalk.green(strMessage)}`);
+		} else if (nLevel === objLevels.WARNING && nVerbose >= 1) {
+			console.log(`${chalk.bgYellow(chalk.bold(strType))}: ${chalk.yellow(strMessage)}`);
+		} else if (nLevel === objLevels.ERROR /*&& nVerbose >= 1*/ ) {
+			console.log(`${chalk.bgRed(chalk.bold(strType))}: ${chalk.red(strMessage)}`);
 		}
 	} catch (err) { //should never happen but trust nobody
-		console.error(`[ERROR PRINTING MESSAGE]: ${err.message}.`);
+		console.error(`[ERROR PRINTING MESSAGE]: ${err.message}, wanted to print: \n\t${strMessage}.`);
 	}
 }
 
-async function logMessage(nLevel, strType, strMessage) {
+/**
+ * Prints information to screen, depending on the verbosity level and writes it in the logfile
+ * @param {Number} nLevel gravity of the message
+ * @param {String} strType type (one of objMessageTypes)
+ * @param {String} strMessage text to describe what happened
+ */
+function fnLogMessage(nLevel, strType, strMessage) {
 	try {
-		let arrPromises = [];
-		if (nVerbose) {
-			arrPromises.push(printMessage(nLevel, strType, strMessage));
-		}
-		arrPromises.push(writeMessageToLogfile(strType, strMessage));
-		await Promise.all(arrPromises);
+		fnPrintMessage(nLevel, strType, strMessage);
+		fnWriteMessageToLogfile(strType, strMessage);
 	} catch (err) {
-		printMessage(levels.ERROR, objMessageTypes.LOGFILE, err.message);
+		fnPrintMessage(objLevels.ERROR, objMessageTypes.LOGFILE, err.message);
 	}
 }
 
 module.exports = {
-	logMessage,
-	types: objMessageTypes,
-	cleanUp,
-	printMessage,
-	writeMessageToLogfile,
-	levels
+	fnLogMessage,
+	objTypes: objMessageTypes,
+	fnCleanUp,
+	fnPrintMessage,
+	fnWriteMessageToLogfile,
+	objLevels,
 };

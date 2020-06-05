@@ -21,7 +21,7 @@ body {
   bottom: 0;
 }
 
-main {
+main, #bottom {
   z-index: 1;
   position: absolute;
   top: 80px;
@@ -30,10 +30,14 @@ main {
   width: 100%;
 }
 
-#chart {
+#jumbotronChart, #jumbotronSkew {
   width: 50%;
   margin-left: auto;
   margin-right: auto;
+}
+
+#jumbotronChart, #jumbotronSkew h1{
+  color: #c1ccd2ed;
 }
 
 #myChart {
@@ -62,4 +66,12 @@ main {
 
 img {
   max-width:100%;
+}
+
+#canvasSkewGraph{
+  opacity: 1;
+}
+
+.themeDark{
+  background-color: #000012ac;
 }

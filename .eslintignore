@@ -1,1 +1,4 @@
 **/*.min.js
+**/old/*
+**/lodash.js
+**/config.js

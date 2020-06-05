@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const genome = require('./genomeUtils');
 
 const {
 	Worker,
@@ -8,7 +7,7 @@ const {
 	workerData
 } = require('worker_threads');
 
-/** Adds up the values from the worker frequency maps into one final array
+/** Adds up the values from the worker frequency maps into one final frequency map and returns an array that contains the most frequent strings from it
  * @param {Array.<Map>} arrWokerMaps 
  * @returns {Array}
  */
@@ -39,6 +38,16 @@ function fnConcatWorkerData(arrWokerMaps) {
 		}
 	});
 
+	// const arrUniqueResponses = [];
+	// let strReverseComplementSequence;
+	// arrMostFrequentResponses.forEach((strSequence) =>{
+	// 	strReverseComplementSequence = genome.fnReverseComplement(strSequence);
+	// 	if(!arrUniqueResponses.includes(strSequence) && !arrUniqueResponses.includes(strReverseComplementSequence)){
+	// 		arrUniqueResponses.push(strSequence);
+	// 	}
+	// });
+	// console.log('Uniques: ' + arrUniqueResponses.toString());
+
 	return arrMostFrequentResponses;
 }
 
@@ -47,14 +56,21 @@ if (isMainThread) {
 		const os = require('os');
 		const argv = require('./argumentParser');
 		const nThreadCount = argv.n || os.cpus().length;
+		const errorHandle = require('./errorHandle');
+		const genomeUtils = require('./genomeUtils');
+
+		if (nThreadCount > os.cpus().length) {
+			errorHandle.fnLogMessage(errorHandle.objLevels.WARNING, errorHandle.objTypes.WARNING, `Running on more threads (${nThreadCount}) than CPUs (${os.cpus().length}) is not recommended.`);
+		}
 
 		try {
 			const arrWorkerPromises = [];
 			const nGenomeLength = strGenome.length;
 			const nMaxIndexToSearch = nGenomeLength - nWantedLength + 1;
-			const strReverseComplementGenome = genome.fnReverseComplement(strGenome);
+			const strReverseComplementGenome = genomeUtils.fnReverseComplement(strGenome);
 			let nLastIndexGiven = -1;
 
+			errorHandle.fnLogMessage(errorHandle.objLevels.INFO, errorHandle.objTypes.WORKERS, `Starting ${nThreadCount} workers.`);
 			for (let nWorkerNumber = 0; nWorkerNumber < nThreadCount; nWorkerNumber++) {
 				//split data equally bewteen workers
 				const nChunkSize = Math.floor(nMaxIndexToSearch / nThreadCount) + (nWorkerNumber < (nMaxIndexToSearch % nThreadCount) ? 1 : 0);
@@ -73,14 +89,18 @@ if (isMainThread) {
 							nMaxMismatches,
 							nChunkBeginsAt,
 							nChunkEndsAt,
-							strWantedLength: nWantedLength
+							nWantedLength
 						}
 					});
 
-					worker.on('error', fnRejectWorker);
+					worker.on('error', (err) => {
+						errorHandle.fnLogMessage(errorHandle.objLevels.ERROR, errorHandle.objTypes.WORKERS + errorHandle.objTypes.ERROR, err.message);
+						fnRejectWorker();
+					});
 					worker.on('exit', (code) => {
 						if (code !== 0)
-							fnRejectWorker(new Error(`Worker stopped with exit code ${code}`));
+							errorHandle.fnLogMessage(errorHandle.objLevels.ERROR, errorHandle.objTypes.WORKERS + errorHandle.objTypes.ERROR, `A worker stopped with exit code ${code}`);
+						fnRejectWorker(new Error(`A worker stopped with exit code ${code}`));
 					});
 					worker.on('message', (message) => {
 						fnResolveWorker(message);
@@ -91,11 +111,13 @@ if (isMainThread) {
 
 			let arrWorkerResponses = await Promise.all(arrWorkerPromises);
 			const arrFinalResponse = fnConcatWorkerData(arrWorkerResponses);
+			errorHandle.fnLogMessage(errorHandle.objLevels.SUCCESS, errorHandle.objTypes.WORKERS, `Successfully found DnaA box candidates: ${arrFinalResponse.toString()}.`);
 			return arrFinalResponse;
-		} catch (err) {
-			//todo handle error;
-		}
 
+		} catch (err) {
+			errorHandle.fnLogMessage(errorHandle.objLevels.ERROR, errorHandle.objTypes.WORKERS + errorHandle.objTypes.ERROR, err || 'The main thread stopped. Either the main or one of the workers failed. Check logfile.');
+			process.exit(2);
+		}
 	};
 } else {
 	/**
@@ -105,14 +127,24 @@ if (isMainThread) {
 			nMaxMismatches,
 			nChunkBeginsAt,
 			nChunkEndsAt,
-			strWantedLength
+			nWantedLength
 	 * }
 	 */
+	//sanity-checking workerData
+	if (!(workerData.strGenome !== undefined &&
+			workerData.strReverseComplementGenome !== undefined &&
+			workerData.nMaxMismatches !== undefined &&
+			workerData.nChunkBeginsAt !== undefined &&
+			workerData.nChunkEndsAt !== undefined &&
+			workerData.nWantedLength !== undefined)) {
+		throw new Error('Worker did not receive the expected data object');
+	}
+	//end
+	const genomeUtils = require('./genomeUtils');
 	const mapFrequency = new Map();
 	for (let i = workerData.nChunkBeginsAt; i <= workerData.nChunkEndsAt; i++) {
-		// console.log(i);
-		const strPattern = _.slice(workerData.strGenome, i, i + workerData.strWantedLength).join('');
-		const arrNeighborhood = genome.fnFindNeighborsWithMismatches(strPattern, workerData.nMaxMismatches);
+		const strPattern = _.slice(workerData.strGenome, i, i + workerData.nWantedLength).join('');
+		const arrNeighborhood = genomeUtils.fnFindNeighborsWithMismatches(strPattern, workerData.nMaxMismatches);
 		arrNeighborhood.forEach((strNeighbor) => {
 			if (!mapFrequency.get(strNeighbor)) {
 				mapFrequency.set(strNeighbor, 1);
@@ -121,8 +153,8 @@ if (isMainThread) {
 			}
 		});
 
-		const strRevPattern = _.slice(workerData.strReverseComplementGenome, i, i + workerData.strWantedLength).join('');
-		const arrRevNeighborhood = genome.fnFindNeighborsWithMismatches(strRevPattern, workerData.nMaxMismatches);
+		const strRevPattern = _.slice(workerData.strReverseComplementGenome, i, i + workerData.nWantedLength).join('');
+		const arrRevNeighborhood = genomeUtils.fnFindNeighborsWithMismatches(strRevPattern, workerData.nMaxMismatches);
 		arrRevNeighborhood.forEach((strNeighbor) => {
 			if (!mapFrequency.get(strNeighbor)) {
 				mapFrequency.set(strNeighbor, 1);

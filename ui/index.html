@@ -17,22 +17,25 @@
             <img id="whiteWavepng" src="wave3.png"></img>
         </div>
     </div>
-    <div id="bottom">
 
-    </div>
 
-    <nav class="navbar fixed-top navbar-expand-lg navbar-dark" style="background-color: #000012ab;">
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark themeDark">
         <a class="navbar-brand" href="#">
             <img src="logo.png" width="170" height="60" class="d-inline-block align-top" alt="" loading="lazy">
         </a>
     </nav>
     <main>
-        <div id="chart" class="jumbotron" style="background-color: #000012ab;">
+        <div id="jumbotronChart" class="jumbotron themeDark">
             <h1>Chart</h1>
-            <canvas id="myChart"></canvas>
+            <canvas id="canvasDnaChart"></canvas>
         </div>
     </main>
-
+    <div id="bottom">
+        <div id="jumbotronSkew" class="jumbotron themeDark">
+            <h1>Skew graph</h1>
+            <canvas id="canvasSkewGraph"></canvas>
+        </div>
+    </div>
 
 
     <script type="text/javascript" src="particles.min.js"></script>
@@ -46,6 +49,8 @@
         integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous">
     </script>
     <script src="Chart.bundle.min.js"></script>
+    <script src="config.js"></script>
+    <script src="lodash.js"></script>
     <script src="index.js"></script>
 </body>
 
