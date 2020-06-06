@@ -31,7 +31,7 @@ function fnConcatWorkerData(arrWokerMaps) {
 			nMaxFrequency = nFrequency;
 		}
 	});
-
+	console.log(nMaxFrequency);
 	mapAllResponses.forEach((value, key) => {
 		if (value === nMaxFrequency) {
 			arrMostFrequentResponses.push(key);
@@ -111,7 +111,7 @@ if (isMainThread) {
 
 			let arrWorkerResponses = await Promise.all(arrWorkerPromises);
 			const arrFinalResponse = fnConcatWorkerData(arrWorkerResponses);
-			errorHandle.fnLogMessage(errorHandle.objLevels.SUCCESS, errorHandle.objTypes.WORKERS, `Successfully found DnaA box candidates: ${arrFinalResponse.toString()}.`);
+			errorHandle.fnLogMessage(errorHandle.objLevels.SUCCESS, errorHandle.objTypes.WORKERS, `Successfully found ${arrFinalResponse.length} DnaA box candidates: ${arrFinalResponse.toString()}.`);
 			return arrFinalResponse;
 
 		} catch (err) {
@@ -119,6 +119,7 @@ if (isMainThread) {
 			process.exit(2);
 		}
 	};
+
 } else {
 	/**
 	 * workerData = {
@@ -130,6 +131,7 @@ if (isMainThread) {
 			nWantedLength
 	 * }
 	 */
+
 	//sanity-checking workerData
 	if (!(workerData.strGenome !== undefined &&
 			workerData.strReverseComplementGenome !== undefined &&
@@ -146,20 +148,26 @@ if (isMainThread) {
 		const strPattern = _.slice(workerData.strGenome, i, i + workerData.nWantedLength).join('');
 		const arrNeighborhood = genomeUtils.fnFindNeighborsWithMismatches(strPattern, workerData.nMaxMismatches);
 		arrNeighborhood.forEach((strNeighbor) => {
-			if (!mapFrequency.get(strNeighbor)) {
-				mapFrequency.set(strNeighbor, 1);
-			} else {
-				mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
+			if (workerData.strGenome.includes(strNeighbor)) {
+				if (!mapFrequency.get(strNeighbor)) {
+					mapFrequency.set(strNeighbor, 1);
+				} else {
+					mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
+				}
 			}
+
 		});
 
-		const strRevPattern = _.slice(workerData.strReverseComplementGenome, i, i + workerData.nWantedLength).join('');
+		const strRevPattern = genomeUtils.fnReverseComplement(strPattern);
 		const arrRevNeighborhood = genomeUtils.fnFindNeighborsWithMismatches(strRevPattern, workerData.nMaxMismatches);
 		arrRevNeighborhood.forEach((strNeighbor) => {
-			if (!mapFrequency.get(strNeighbor)) {
-				mapFrequency.set(strNeighbor, 1);
-			} else {
-				mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
+			if (workerData.strGenome.includes(strNeighbor)) {
+				if (!mapFrequency.get(strNeighbor)) {
+					mapFrequency.set(strNeighbor, 1);
+				} else {
+					mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
+
+				}
 			}
 		});
 	}

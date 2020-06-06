@@ -57,7 +57,7 @@ const argv = require('yargs')
 		},
 
 	})
-	.default('m', 3)
+	.default('m', 1)
 	.default('d', 9)
 	.default('n', os.cpus().length, `current number of CPUs (${os.cpus().length})`)
 	.default('o', 500)

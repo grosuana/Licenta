@@ -35,10 +35,22 @@ async function fnMain() {
 			errorHandle.fnLogMessage(errorHandle.objLevels.INFO, errorHandle.objTypes.MAIN, `Computed Skew graph. Minimum Skew value is ${objSkewGraphData.nMinValue} at position ${objSkewGraphData.nMinIndex}.`);
 		}
 
-		const strSequence = strGenome.substring(objSkewGraphData.nMinIndex, objSkewGraphData.nMinIndex + nWindowLength);
+		const strSequence = (strGenome + strGenome).substring(objSkewGraphData.nMinIndex, objSkewGraphData.nMinIndex + nWindowLength);
 		errorHandle.fnLogMessage(errorHandle.objLevels.INFO, errorHandle.objTypes.MAIN, 'Looking for DnaA box candidates.');
 		const arrResult = await fnFrequentWordsWithMismathces(strSequence, nWantedLength, nMaxMismatches);
-		
+
+		const arrCandidatesPositions = genomeUtils.fnFindCandidatesPositions(arrResult, strSequence, nMaxMismatches);
+		// console.log(arrCandidatesPositions.length);
+
+		const objGenomeData = {
+			arrCandidates: arrResult,
+			objSkew: objSkewGraphData,
+			strGenome: strSequence,
+			arrPositions: arrCandidatesPositions,
+			nSequenceLength: nWantedLength
+		}
+
+		await fileParser.writeConfigFile(objGenomeData);
 	} catch (err) {
 		errorHandle.fnLogMessage(errorHandle.objLevels.ERROR, errorHandle.objTypes.MAIN + errorHandle.objTypes.ERROR, err.message);
 		process.exit(3);

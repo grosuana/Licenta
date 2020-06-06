@@ -46,20 +46,20 @@ function fnReverseComplement(strPattern) {
 	let strReverseComplement = '';
 	for (let i = 0; i < strPattern.length; i++) {
 		switch (strPattern[i]) {
-		case 'A':
-			strReverseComplement = strReverseComplement.concat('T');
-			break;
-		case 'T':
-			strReverseComplement = strReverseComplement.concat('A');
-			break;
-		case 'C':
-			strReverseComplement = strReverseComplement.concat('G');
-			break;
-		case 'G':
-			strReverseComplement = strReverseComplement.concat('C');
-			break;
-		default:
-			break;
+			case 'A':
+				strReverseComplement = strReverseComplement.concat('T');
+				break;
+			case 'T':
+				strReverseComplement = strReverseComplement.concat('A');
+				break;
+			case 'C':
+				strReverseComplement = strReverseComplement.concat('G');
+				break;
+			case 'G':
+				strReverseComplement = strReverseComplement.concat('C');
+				break;
+			default:
+				break;
 		}
 	}
 	return _.reverse(strReverseComplement.split('')).join('');
@@ -78,21 +78,21 @@ function fnSkewDiagram(strGenome) {
 	let nMinIndexInGenome = 0;
 	for (let i = 0; i < nGenomeLength; i++) {
 		switch (strGenome[i]) {
-		case 'G':
-			nLastValue += 1;
-			arrSkew.push(nLastValue);
-			if (nLastValue < nMinValue) {
-				nMinValue = nLastValue;
-				nMinIndexInGenome = i;
-			}
-			break;
-		case 'C':
-			nLastValue -= 1;
-			arrSkew.push(nLastValue);
-			break;
-		default:
-			arrSkew.push(nLastValue);
-			break;
+			case 'G':
+				nLastValue += 1;
+				arrSkew.push(nLastValue);
+				if (nLastValue < nMinValue) {
+					nMinValue = nLastValue;
+					nMinIndexInGenome = i;
+				}
+				break;
+			case 'C':
+				nLastValue -= 1;
+				arrSkew.push(nLastValue);
+				break;
+			default:
+				arrSkew.push(nLastValue);
+				break;
 		}
 	}
 
@@ -157,10 +157,37 @@ function fnSkewDiagramForceMinimum(strGenome, nForcedPosition) {
 
 }
 
+function fnFindCandidatesPositions(arrCandidates, strGenome, nMaxMismatches) {
+	let arrCandidatesPositions = [];
+	arrCandidates.forEach((strCandidate) => {
+		const arrPartialNeighborhood = fnFindNeighborsWithMismatches(strCandidate, nMaxMismatches);
+		arrPartialNeighborhood.forEach((strNeighbour) => {
+			if (strGenome.includes(strNeighbour)) {
+
+				let nNeighbourIndex = strGenome.indexOf(strNeighbour)
+				// console.log(strNeighbour)
+				if (strGenome.indexOf(strNeighbour) !== strGenome.lastIndexOf(strNeighbour)) { //multiple app.
+					while (nNeighbourIndex !== -1) {
+						arrCandidatesPositions.push(nNeighbourIndex);
+						// console.log("ap multiple: " + strNeighbour + nNeighbourIndex)
+						nNeighbourIndex = strGenome.indexOf(strNeighbour, nNeighbourIndex + 1);
+						
+					}
+				} else { //only one app.
+					arrCandidatesPositions.push(nNeighbourIndex);
+				}
+			}
+		})
+	});
+	console.log(arrCandidatesPositions)
+	return arrCandidatesPositions;
+}
+
 module.exports = {
 	fnFindNeighborsWithMismatches,
 	fnReverseComplement,
 	fnSkewDiagram,
 	fnSkewDiagramLocalMinimum,
 	fnSkewDiagramForceMinimum,
+	fnFindCandidatesPositions
 };
