@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-
+const opn = require('opn');
+const path = require('path');
 const argv = require('./utils/argumentParser');
 const fileParser = require('./utils/fileParser');
 const errorHandle = require('./utils/errorHandle');
@@ -40,7 +41,7 @@ async function fnMain() {
 		const arrResult = await fnFrequentWordsWithMismathces(strSequence, nWantedLength, nMaxMismatches);
 
 		const arrCandidatesPositions = genomeUtils.fnFindCandidatesPositions(arrResult, strSequence, nMaxMismatches);
-		console.log(arrCandidatesPositions.length);
+		// console.log(arrCandidatesPositions.length);
 
 		const objGenomeData = {
 			arrCandidates: arrResult,
@@ -49,9 +50,11 @@ async function fnMain() {
 			arrPositions: arrCandidatesPositions,
 			nSequenceLength: nWantedLength,
 			nSequenceStartPosition: objSkewGraphData.nMinIndex,
-		}
+		};
 
 		await fileParser.writeConfigFile(objGenomeData);
+		errorHandle.fnLogMessage(errorHandle.objLevels.INFO, errorHandle.objTypes.MAIN, 'Opening display page in default browser.');
+		opn(path.join(__dirname, './ui/index.html'));
 	} catch (err) {
 		errorHandle.fnLogMessage(errorHandle.objLevels.ERROR, errorHandle.objTypes.MAIN + errorHandle.objTypes.ERROR, err.message);
 		process.exit(3);

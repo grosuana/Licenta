@@ -31,7 +31,7 @@ function fnConcatWorkerData(arrWokerMaps) {
 			nMaxFrequency = nFrequency;
 		}
 	});
-	console.log("Max frequency: " + nMaxFrequency);
+	// console.log("Max frequency: " + nMaxFrequency);
 	mapAllResponses.forEach((value, key) => {
 		if (value === nMaxFrequency) {
 			arrMostFrequentResponses.push(key);
@@ -149,11 +149,11 @@ if (isMainThread) {
 		const arrNeighborhood = genomeUtils.fnFindNeighborsWithMismatches(strPattern, workerData.nMaxMismatches);
 		arrNeighborhood.forEach((strNeighbor) => {
 			// if (workerData.strGenome.includes(strNeighbor)) {
-				if (!mapFrequency.get(strNeighbor)) {
-					mapFrequency.set(strNeighbor, 1);
-				} else {
-					mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
-				}
+			if (!mapFrequency.get(strNeighbor)) {
+				mapFrequency.set(strNeighbor, 1);
+			} else {
+				mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
+			}
 			// }
 
 		});
@@ -162,12 +162,12 @@ if (isMainThread) {
 		const arrRevNeighborhood = genomeUtils.fnFindNeighborsWithMismatches(strRevPattern, workerData.nMaxMismatches);
 		arrRevNeighborhood.forEach((strNeighbor) => {
 			// if (workerData.strGenome.includes(strNeighbor)) {
-				if (!mapFrequency.get(strNeighbor)) {
-					mapFrequency.set(strNeighbor, 1);
-				} else {
-					mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
+			if (!mapFrequency.get(strNeighbor)) {
+				mapFrequency.set(strNeighbor, 1);
+			} else {
+				mapFrequency.set(strNeighbor, mapFrequency.get(strNeighbor) + 1);
 
-				}
+			}
 			// }
 		});
 	}

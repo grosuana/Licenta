@@ -1,6 +1,5 @@
 const divCanvas = document.getElementById('particle-canvas');
-const divChart = document.getElementById('chart');
-const objGenomeData = JSON.parse(strGenomeData);
+const objGenomeData = JSON.parse(strGenomeData); //eslint-disable-line
 
 // eslint-disable-next-line
 const particleCanvas = new ParticleNetwork(divCanvas, {
@@ -25,7 +24,7 @@ function fnPrepareGenomeDataToDisplay(objGenomeData, nHighlightOffset, nDefaultR
 	let nScaledVal;
 	let nHighlight;
 	for (let i = 0; i < strSequence.length; i++) {
-		if (_.indexOf(objGenomeData.arrPositions, i) !== -1) {
+		if (_.indexOf(objGenomeData.arrPositions, i) !== -1) { //eslint-disable-line
 			nHighlight = objGenomeData.nSequenceLength - 1;
 		}
 		nScaledHeight = nRowNumber - Math.floor(i / nElementsPerRow) + ((nHighlight >= 0) && nHighlightOffset);
@@ -36,36 +35,36 @@ function fnPrepareGenomeDataToDisplay(objGenomeData, nHighlightOffset, nDefaultR
 			i: i + objGenomeData.nSequenceStartPosition
 		});
 		switch (strSequence[i]) {
-			case 'A':
-				arrDataA.push(new Object({
-					x: nScaledVal,
-					y: nScaledHeight,
-					r: nDefaultRadius
-				}))
-				break;
-			case 'C':
-				arrDataC.push(new Object({
-					x: nScaledVal,
-					y: nScaledHeight,
-					r: nDefaultRadius
-				}))
-				break;
-			case 'G':
-				arrDataG.push(new Object({
-					x: nScaledVal,
-					y: nScaledHeight,
-					r: nDefaultRadius
-				}))
-				break;
-			case 'T':
-				arrDataT.push(new Object({
-					x: nScaledVal,
-					y: nScaledHeight,
-					r: nDefaultRadius
-				}))
-				break;
-			default:
-				break;
+		case 'A':
+			arrDataA.push(new Object({
+				x: nScaledVal,
+				y: nScaledHeight,
+				r: nDefaultRadius
+			}));
+			break;
+		case 'C':
+			arrDataC.push(new Object({
+				x: nScaledVal,
+				y: nScaledHeight,
+				r: nDefaultRadius
+			}));
+			break;
+		case 'G':
+			arrDataG.push(new Object({
+				x: nScaledVal,
+				y: nScaledHeight,
+				r: nDefaultRadius
+			}));
+			break;
+		case 'T':
+			arrDataT.push(new Object({
+				x: nScaledVal,
+				y: nScaledHeight,
+				r: nDefaultRadius
+			}));
+			break;
+		default:
+			break;
 		}
 		nHighlight--;
 	}
@@ -75,7 +74,7 @@ function fnPrepareGenomeDataToDisplay(objGenomeData, nHighlightOffset, nDefaultR
 		arrDataC,
 		arrDataG,
 		arrDataT
-	}
+	};
 }
 
 const {
@@ -91,37 +90,37 @@ const dnaChart = new Chart(canvasDnaChart, {
 	type: 'bubble',
 	data: {
 		datasets: [{
-				label: ['A'],
-				data: arrDataA,
-				backgroundColor: 'rgba(254, 95, 85, 0.8)',
-				borderColor: 'rgba(254, 95, 85, 1)',
-				borderWidth: 1,
-				hoverRadius: 10,
-			},
-			{
-				label: ['C'],
-				data: arrDataC,
-				backgroundColor: 'rgba(243, 167, 18, 0.8)',
-				borderColor: 'rgba(243, 167, 18, 1)',
-				borderWidth: 1,
-				hoverRadius: 10,
-			},
-			{
-				label: ['G'],
-				data: arrDataG,
-				backgroundColor: 'rgba(103, 97, 168, 0.8)',
-				borderColor: 'rgba(103, 97, 168, 1)',
-				borderWidth: 1,
-				hoverRadius: 10,
-			},
-			{
-				label: ['T'],
-				data: arrDataT,
-				backgroundColor: 'rgba(0, 155, 90, 0.8)',
-				borderColor: 'rgba(0, 155, 90, 1)',
-				borderWidth: 1,
-				hoverRadius: 10,
-			}
+			label: ['A'],
+			data: arrDataA,
+			backgroundColor: 'rgba(254, 95, 85, 0.8)',
+			borderColor: 'rgba(254, 95, 85, 1)',
+			borderWidth: 1,
+			hoverRadius: 10,
+		},
+		{
+			label: ['C'],
+			data: arrDataC,
+			backgroundColor: 'rgba(243, 167, 18, 0.8)',
+			borderColor: 'rgba(243, 167, 18, 1)',
+			borderWidth: 1,
+			hoverRadius: 10,
+		},
+		{
+			label: ['G'],
+			data: arrDataG,
+			backgroundColor: 'rgba(103, 97, 168, 0.8)',
+			borderColor: 'rgba(103, 97, 168, 1)',
+			borderWidth: 1,
+			hoverRadius: 10,
+		},
+		{
+			label: ['T'],
+			data: arrDataT,
+			backgroundColor: 'rgba(0, 155, 90, 0.8)',
+			borderColor: 'rgba(0, 155, 90, 1)',
+			borderWidth: 1,
+			hoverRadius: 10,
+		}
 		]
 	},
 	options: {
@@ -156,7 +155,7 @@ const dnaChart = new Chart(canvasDnaChart, {
 						}
 					}
 					if (label) {
-						label += ": " + nTrueIndex;
+						label += ': ' + nTrueIndex;
 					}
 					return label;
 				}
@@ -170,7 +169,7 @@ function sampleData(arrDataToSample, nSkip) {
 	for (let i = 0; i < arrDataToSample.length; i += nSkip) {
 		resultArray.push(arrDataToSample[i]);
 	}
-	const arrLabels = _.times(arrDataToSample.length / nSkip, (index) => {
+	const arrLabels = _.times(arrDataToSample.length / nSkip, (index) => {//eslint-disable-line
 		return index * nSkip;
 	});
 	return {
@@ -183,23 +182,34 @@ const objSampleData = sampleData(objGenomeData.objSkew.arrSkew, 1000);
 const arrSampledSkewData = objSampleData.resultArray;
 const arrLabels = objSampleData.arrLabels;
 
-const stepikChart = new Chart(canvasSkewGraph, {
+//eslint-disable-next-line
+const stepikChart = new Chart(canvasSkewGraph, {//eslint-disable-line
 	type: 'line',
 
 	data: {
 		labels: arrLabels,
 		datasets: [{
-			label: '# of Votes',
+			label: 'G-C',
 			data: arrSampledSkewData,
+			pointRadius: 0.2,
+			pointBorderColor: 'rgba(36, 34, 56, 1)'
 		}]
 	},
 	options: {
 		scales: {
 			yAxes: [{
 				ticks: {
-					beginAtZero: true
+					beginAtZero: true,
+					fontColor: '#dee8eeed'
+				}
+			}],
+			xAxes: [{
+				ticks: {
+					beginAtZero: true,
+					fontColor: '#dee8eeed'
 				}
 			}]
-		}
+		},
+
 	}
 });
