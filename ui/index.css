@@ -9,7 +9,7 @@ body {
 
 #container {
   width: 100%;
-  height: 130%;
+  height: 150%;
   position: relative;
 }
 
@@ -37,7 +37,7 @@ main, #bottom {
 }
 
 #jumbotronChart, #jumbotronSkew h1{
-  color: #c1ccd2ed;
+  color: #dee8eeed;
 }
 
 #myChart {
@@ -73,6 +73,6 @@ img {
 }
 
 .themeDark{
-  /* background-color: #000012ac; */
-  background-color: white;
+  background-color: #000012ac;
+  /* background-color: white; */
 }

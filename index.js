@@ -40,14 +40,15 @@ async function fnMain() {
 		const arrResult = await fnFrequentWordsWithMismathces(strSequence, nWantedLength, nMaxMismatches);
 
 		const arrCandidatesPositions = genomeUtils.fnFindCandidatesPositions(arrResult, strSequence, nMaxMismatches);
-		// console.log(arrCandidatesPositions.length);
+		console.log(arrCandidatesPositions.length);
 
 		const objGenomeData = {
 			arrCandidates: arrResult,
 			objSkew: objSkewGraphData,
 			strGenome: strSequence,
 			arrPositions: arrCandidatesPositions,
-			nSequenceLength: nWantedLength
+			nSequenceLength: nWantedLength,
+			nSequenceStartPosition: objSkewGraphData.nMinIndex,
 		}
 
 		await fileParser.writeConfigFile(objGenomeData);

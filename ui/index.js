@@ -12,6 +12,7 @@ const particleCanvas = new ParticleNetwork(divCanvas, {
 });
 
 const canvasDnaChart = document.getElementById('canvasDnaChart');
+const arrObjectsWithTrueIndex = [];
 
 function fnPrepareGenomeDataToDisplay(objGenomeData, nHighlightOffset, nDefaultRadius, nHighlightRadius, nRowNumber) {
 	const strSequence = objGenomeData.strGenome;
@@ -28,7 +29,12 @@ function fnPrepareGenomeDataToDisplay(objGenomeData, nHighlightOffset, nDefaultR
 			nHighlight = objGenomeData.nSequenceLength - 1;
 		}
 		nScaledHeight = nRowNumber - Math.floor(i / nElementsPerRow) + ((nHighlight >= 0) && nHighlightOffset);
-		nScaledVal = i % nElementsPerRow;
+		nScaledVal = i % nElementsPerRow + 0.5;
+		arrObjectsWithTrueIndex.push({
+			x: nScaledVal,
+			y: nScaledHeight,
+			i: i + objGenomeData.nSequenceStartPosition
+		});
 		switch (strSequence[i]) {
 			case 'A':
 				arrDataA.push(new Object({
@@ -61,7 +67,7 @@ function fnPrepareGenomeDataToDisplay(objGenomeData, nHighlightOffset, nDefaultR
 			default:
 				break;
 		}
-		nHighlight --;
+		nHighlight--;
 	}
 
 	return {
@@ -77,7 +83,9 @@ const {
 	arrDataC,
 	arrDataG,
 	arrDataT
-} = fnPrepareGenomeDataToDisplay(objGenomeData, 0.2, 5, 2, 5);
+} = fnPrepareGenomeDataToDisplay(objGenomeData, 0.1, 4.8, 2, 5);
+
+
 // eslint-disable-next-line
 const dnaChart = new Chart(canvasDnaChart, {
 	type: 'bubble',
@@ -85,54 +93,74 @@ const dnaChart = new Chart(canvasDnaChart, {
 		datasets: [{
 				label: ['A'],
 				data: arrDataA,
-				backgroundColor: 'rgba(255, 99, 132, 0.2)',
-				borderColor: 'rgba(255, 99, 132, 1)',
-				// 'rgba(255, 99, 132, 0.2)',
-				// 'rgba(54, 162, 235, 0.2)',
-				// 'rgba(255, 206, 86, 0.2)',
-				// 'rgba(75, 192, 192, 0.2)',
-				// 'rgba(153, 102, 255, 0.2)',
-				// 'rgba(255, 159, 64, 0.2)'
-				// borderColor: [
-				// 	'rgba(255, 99, 132, 1)',
-				// 	'rgba(54, 162, 235, 1)',
-				// 	'rgba(255, 206, 86, 1)',
-				// 	'rgba(75, 192, 192, 1)',
-				// 	'rgba(153, 102, 255, 1)',
-				// 	'rgba(255, 159, 64, 1)'
-				// ],
-				borderWidth: 1
+				backgroundColor: 'rgba(254, 95, 85, 0.8)',
+				borderColor: 'rgba(254, 95, 85, 1)',
+				borderWidth: 1,
+				hoverRadius: 10,
 			},
 			{
 				label: ['C'],
 				data: arrDataC,
-				backgroundColor: 'rgba(54, 162, 235, 0.2)',
-				borderColor: 'rgba(54, 162, 235, 1)',
-				borderWidth: 1
+				backgroundColor: 'rgba(243, 167, 18, 0.8)',
+				borderColor: 'rgba(243, 167, 18, 1)',
+				borderWidth: 1,
+				hoverRadius: 10,
 			},
 			{
 				label: ['G'],
 				data: arrDataG,
-				backgroundColor: 'rgba(255, 206, 86, 0.2)',
-				borderColor: 'rgba(255, 206, 86, 1)',
-				borderWidth: 1
+				backgroundColor: 'rgba(103, 97, 168, 0.8)',
+				borderColor: 'rgba(103, 97, 168, 1)',
+				borderWidth: 1,
+				hoverRadius: 10,
 			},
 			{
 				label: ['T'],
 				data: arrDataT,
-				backgroundColor: 'rgba(75, 192, 192, 0.2)',
-				borderColor: 'rgba(75, 192, 192, 1)',
-				borderWidth: 1
+				backgroundColor: 'rgba(0, 155, 90, 0.8)',
+				borderColor: 'rgba(0, 155, 90, 1)',
+				borderWidth: 1,
+				hoverRadius: 10,
 			}
 		]
 	},
 	options: {
 		scales: {
 			yAxes: [{
+				display: false,
 				ticks: {
 					beginAtZero: true
-				}
+				},
+				gridLines: false
+			}],
+			xAxes: [{
+				display: false,
+				gridLines: false
 			}]
+		},
+		legend: {
+			display: true,
+			labels: {
+				boxWidth: 70
+			}
+		},
+		tooltips: {
+			enabled: true,
+			callbacks: {
+				label: function (tooltipItem, data) {
+					let label = data.datasets[tooltipItem.datasetIndex].label || '';
+					let nTrueIndex = -1;
+					for (let i = 0; i < arrObjectsWithTrueIndex.length; i++) {
+						if (arrObjectsWithTrueIndex[i].x === tooltipItem.xLabel && arrObjectsWithTrueIndex[i].y === tooltipItem.yLabel) {
+							nTrueIndex = arrObjectsWithTrueIndex[i].i.toString();
+						}
+					}
+					if (label) {
+						label += ": " + nTrueIndex;
+					}
+					return label;
+				}
+			}
 		}
 	}
 });
@@ -157,28 +185,12 @@ const arrLabels = objSampleData.arrLabels;
 
 const stepikChart = new Chart(canvasSkewGraph, {
 	type: 'line',
+
 	data: {
 		labels: arrLabels,
 		datasets: [{
 			label: '# of Votes',
 			data: arrSampledSkewData,
-			// backgroundColor: [
-			// 	'rgba(255, 99, 132, 0.2)',
-			// 	'rgba(54, 162, 235, 0.2)',
-			// 	'rgba(255, 206, 86, 0.2)',
-			// 	'rgba(75, 192, 192, 0.2)',
-			// 	'rgba(153, 102, 255, 0.2)',
-			// 	'rgba(255, 159, 64, 0.2)'
-			// ],
-			// borderColor: [
-			// 	'rgba(255, 99, 132, 1)',
-			// 	'rgba(54, 162, 235, 1)',
-			// 	'rgba(255, 206, 86, 1)',
-			// 	'rgba(75, 192, 192, 1)',
-			// 	'rgba(153, 102, 255, 1)',
-			// 	'rgba(255, 159, 64, 1)'
-			// ],
-			// borderWidth: 1
 		}]
 	},
 	options: {
