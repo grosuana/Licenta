@@ -20,18 +20,19 @@ function fnConcatWorkerData(arrWokerMaps) {
 			if (!mapAllResponses.get(strKey)) {
 				mapAllResponses.set(strKey, nValue);
 			} else {
+				// console.log(strKey + "era deja. old:" + mapAllResponses.get('TTATCCACA') + "new: " + nValue)
 				mapAllResponses.set(strKey, mapAllResponses.get(strKey) + nValue);
 			}
 		});
 	});
-
+	
 	let nMaxFrequency = 0;
 	mapAllResponses.forEach((nFrequency) => {
 		if (nFrequency > nMaxFrequency) {
 			nMaxFrequency = nFrequency;
 		}
 	});
-	// console.log("Max frequency: " + nMaxFrequency);
+
 	mapAllResponses.forEach((value, key) => {
 		if (value === nMaxFrequency) {
 			arrMostFrequentResponses.push(key);

@@ -53,8 +53,9 @@ async function fnMain() {
 		};
 
 		await fileParser.writeConfigFile(objGenomeData);
-		errorHandle.fnLogMessage(errorHandle.objLevels.INFO, errorHandle.objTypes.MAIN, 'Opening display page in default browser.');
+		errorHandle.fnLogMessage(errorHandle.objLevels.INFO, errorHandle.objTypes.MAIN, `Opening ${path.join(__dirname, './ui/index.html')} in default browser.`);
 		opn(path.join(__dirname, './ui/index.html'));
+
 	} catch (err) {
 		errorHandle.fnLogMessage(errorHandle.objLevels.ERROR, errorHandle.objTypes.MAIN + errorHandle.objTypes.ERROR, err.message);
 		process.exit(3);
