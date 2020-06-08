@@ -1,11 +1,14 @@
 {
-  "name": "licenta",
+  "name": "originer",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "originer": "./index.js"
   },
   "repository": {
     "type": "git",
