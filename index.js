@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const opn = require('opn');
+const opn = require('open');
 const path = require('path');
 const argv = require('./utils/argumentParser');
 const fileParser = require('./utils/fileParser');

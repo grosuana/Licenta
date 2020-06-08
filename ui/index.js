@@ -4,7 +4,7 @@ const objGenomeData = JSON.parse(strGenomeData); //eslint-disable-line
 // eslint-disable-next-line
 const particleCanvas = new ParticleNetwork(divCanvas, {
 	particleColor: '#7a73ff',
-	background: 'poza8.png',
+	background: 'bg.png',
 	interactive: true,
 	speed: 'medium',
 	density: 'high'

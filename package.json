@@ -1,20 +1,18 @@
 {
   "name": "originer",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "bin": {
-    "originer": "./index.js"
-  },
+  "bin": "./index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/grosuana/Licenta.git"
   },
-  "author": "",
+  "author": "Ana Grosu",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/grosuana/Licenta/issues"
@@ -24,14 +22,14 @@
     "eslint": "^7.1.0",
     "eslint-config-strongloop": "^2.1.0",
     "eslint-plugin-react": "^7.20.0",
+    "http-server": "^0.12.3",
     "lodash": "^4.17.15"
   },
   "dependencies": {
     "biojs-io-fasta": "^0.1.17",
     "chalk": "^4.0.0",
     "fs-extra": "^9.0.0",
-    "http-server": "^0.12.3",
-    "opn": "^6.0.0",
+    "open": "^7.0.4",
     "yargs": "^15.3.1"
   }
 }
