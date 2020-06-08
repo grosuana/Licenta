@@ -1,6 +1,6 @@
 {
   "name": "originer",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -22,13 +22,13 @@
     "eslint": "^7.1.0",
     "eslint-config-strongloop": "^2.1.0",
     "eslint-plugin-react": "^7.20.0",
-    "http-server": "^0.12.3",
-    "lodash": "^4.17.15"
+    "http-server": "^0.12.3"
   },
   "dependencies": {
     "biojs-io-fasta": "^0.1.17",
     "chalk": "^4.0.0",
     "fs-extra": "^9.0.0",
+    "lodash": "^4.17.15",
     "open": "^7.0.4",
     "yargs": "^15.3.1"
   }
