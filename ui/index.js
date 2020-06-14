@@ -192,7 +192,7 @@ const stepikChart = new Chart(canvasSkewGraph, {//eslint-disable-line
 			label: 'G-C',
 			data: arrSampledSkewData,
 			pointRadius: 0.2,
-			pointBorderColor: 'rgba(36, 34, 56, 1)'
+			pointBorderColor: 'rgba(200, 200, 200, 1)'
 		}]
 	},
 	options: {
